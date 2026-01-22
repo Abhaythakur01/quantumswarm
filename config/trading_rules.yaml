@@ -1,0 +1,63 @@
+# Constitutional AI Trading Rules
+# These rules are hard constraints that cannot be violated
+
+risk_limits:
+  # Position Limits
+  max_single_position_pct: 0.10      # Never risk > 10% on single position
+  max_sector_exposure_pct: 0.30      # Max 30% in one sector
+  max_asset_class_pct: 0.50          # Max 50% in one asset class
+  min_cash_reserve_pct: 0.10         # Always keep 10% cash
+
+  # Drawdown Limits
+  daily_loss_reduce_threshold: 0.03  # Reduce positions at 3% daily loss
+  weekly_loss_pause_threshold: 0.05  # Pause trading at 5% weekly loss
+  monthly_loss_review_threshold: 0.10 # Manual review at 10% monthly loss
+  max_drawdown_shutdown: 0.15        # Emergency shutdown at 15% drawdown
+
+  # Correlation Limits
+  max_position_correlation: 0.70     # Max correlation between positions
+  min_diversification_count: 5       # Minimum 5 positions for diversification
+
+trading_constraints:
+  # Time-based Rules
+  no_trade_last_minutes: 15          # No new positions in last 15 min
+  no_trade_first_minutes: 5          # No trades in first 5 min (opening volatility)
+
+  # News-based Rules
+  require_news_confirmation: false   # Don't trade on unconfirmed news
+  earnings_blackout_days: 2          # No trading 2 days before earnings
+
+  # Execution Rules
+  max_slippage_pct: 0.005           # Max 0.5% slippage allowed
+  min_confidence_threshold: 0.60    # Min 60% model confidence to trade
+
+position_sizing:
+  method: "half_kelly"              # half_kelly, fixed, volatility_scaled
+  fixed_size_pct: 0.05              # For fixed method
+  kelly_fraction: 0.50              # Half Kelly
+  volatility_lookback: 20           # Days for vol calculation
+  volatility_target: 0.15           # Annual vol target
+
+circuit_breakers:
+  - trigger: "daily_loss_3pct"
+    action: "reduce_positions_50pct"
+    cooldown_hours: 4
+
+  - trigger: "weekly_loss_5pct"
+    action: "close_all_positions"
+    cooldown_hours: 24
+
+  - trigger: "max_drawdown_15pct"
+    action: "emergency_shutdown"
+    requires_manual_reset: true
+
+  - trigger: "vix_above_40"
+    action: "reduce_positions_75pct"
+    cooldown_hours: 1
+
+self_critique_prompts:
+  - "Does this trade violate any position size limits?"
+  - "Is the portfolio becoming too correlated?"
+  - "Are we trading during a blackout period?"
+  - "Is the confidence level sufficient?"
+  - "Does this trade align with the current market regime?"

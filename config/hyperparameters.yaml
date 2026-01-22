@@ -1,0 +1,91 @@
+# Hyperparameters for all agents and training
+
+# Data Configuration
+data:
+  sequence_length: 1000  # Days of history for Mamba
+  features_count: 50     # Number of input features
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+  start_date: "2019-01-01"
+  end_date: "2024-12-31"
+
+# Mamba Agent
+mamba:
+  d_model: 256
+  d_state: 16
+  d_conv: 4
+  expand: 2
+  num_layers: 4
+  dropout: 0.1
+  learning_rate: 0.0001
+  batch_size: 64
+  epochs: 100
+  early_stopping_patience: 10
+
+# KAN Agent
+kan:
+  width: [20, 10, 5, 1]
+  grid: 5
+  k: 3  # Spline order
+  seed: 42
+  learning_rate: 0.001
+  batch_size: 32
+  epochs: 50
+  regularization_lambda: 0.01
+
+# Liquid Neural Network Agent
+liquid:
+  hidden_size: 64
+  num_layers: 3
+  backbone_units: 128
+  backbone_layers: 2
+  learning_rate: 0.0001
+  batch_size: 64
+  epochs: 100
+
+# Diffusion Model (Scenario Generator)
+diffusion:
+  model_channels: 128
+  num_res_blocks: 2
+  attention_resolutions: [16, 8]
+  dropout: 0.1
+  num_timesteps: 1000
+  learning_rate: 0.0001
+  batch_size: 32
+  epochs: 200
+
+# Mixture of Experts
+moe:
+  num_experts: 4
+  top_k: 2
+  hidden_dim: 256
+  router_jitter: 0.1
+  load_balancing_weight: 0.01
+  learning_rate: 0.0001
+
+# Reinforcement Learning
+rl:
+  algorithm: "PPO"  # or "DPO"
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  learning_rate: 0.0003
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 10
+  ent_coef: 0.01
+
+# Test-Time Training
+ttt:
+  adaptation_steps: 10
+  adaptation_lr: 0.0001
+  buffer_size: 100
+
+# Training General
+training:
+  device: "auto"  # auto, cuda, cpu
+  mixed_precision: true
+  gradient_clip: 1.0
+  checkpoint_frequency: 10  # epochs
+  log_frequency: 100  # steps
